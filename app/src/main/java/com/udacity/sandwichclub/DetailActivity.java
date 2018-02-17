@@ -1,6 +1,7 @@
 package com.udacity.sandwichclub;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 import com.udacity.sandwichclub.model.Sandwich;
 import com.udacity.sandwichclub.utils.JsonUtils;
 
@@ -64,10 +66,16 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         populateUI(sandwich);
-        Picasso.with(this)
-                .load(sandwich.getImage())
-                .into(ingredientsIv);
-
+        RequestCreator picasso = Picasso.with(this).load(sandwich.getImage());
+        //For API lower than 21 getDrawable(int id, Theme theme) doesn't exist, need to use the deprecated version getDrawable(int id)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            picasso.placeholder(getResources().getDrawable(R.mipmap.ic_launcher, getTheme()))
+                    .error(getResources().getDrawable(R.mipmap.ic_launcher, getTheme()));
+        }else {
+            picasso.placeholder(getResources().getDrawable(R.mipmap.ic_launcher))
+                    .error(getResources().getDrawable(R.mipmap.ic_launcher));
+        }
+        picasso.into(ingredientsIv);
         //Need to use this since we're using the AppCompatActivity, Allow Up Navigation
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
